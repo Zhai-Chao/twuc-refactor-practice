@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -17,13 +18,13 @@ public class CustomerTest {
 
 	private static final String GOLD_PATH = "data/";
 
-    private Customer dinsdale = new Customer("Dinsdale Pirhana");
+    private final Customer dinsdale = new Customer("Dinsdale Pirhana");
 
-    private Movie python = new Movie("Monty Python and the Holy Grail", Movie.REGULAR);
-	private Movie ran = new Movie("Ran", Movie.REGULAR);
-	private Movie la = new Movie("LA Confidential", Movie.NEW_RELEASE);
-	private Movie trek = new Movie("Star Trek 13.2", Movie.NEW_RELEASE);
-	private Movie wallace = new Movie("Wallace and Gromit", Movie.CHILDRENS);
+    private final Movie python = new RegularMovie("Monty Python and the Holy Grail");
+	private final Movie ran = new RegularMovie("Ran");
+	private  Movie la = new NewReleaseMovie("LA Confidential");
+	private final Movie trek = new NewReleaseMovie("Star Trek 13.2");
+	private final Movie wallace = new ChildrenMovie("Wallace and Gromit");
 
     @BeforeEach
     public void setUpData(){
@@ -47,7 +48,8 @@ public class CustomerTest {
 
     @Test
     public void shouldOutputChangedStatement() throws Exception {
-        la.setPriceCode(Movie.REGULAR);
+        la = new RegularMovie("LA Confidential");
+        dinsdale.getRentalList().set(2, new Rental (la, 2));
         verifyOutput(dinsdale.statement(), "outputChange");
     }
 
@@ -58,7 +60,7 @@ public class CustomerTest {
     */
     	
     protected void verifyOutput(String actualValue, String fileName) throws IOException{
-        String filePath = getClass().getClassLoader().getResource(GOLD_PATH + fileName).getPath();
+        String filePath = Objects.requireNonNull(getClass().getClassLoader().getResource(GOLD_PATH + fileName)).getPath();
         BufferedReader file = new BufferedReader (new FileReader (filePath));
         BufferedReader actualStream = new BufferedReader (new StringReader (actualValue));
         String thisFileLine;
